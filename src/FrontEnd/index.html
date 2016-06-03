@@ -1,0 +1,333 @@
+<!-- Remarks
+
+- About the favicon image -
+The favicon original file can be found at https://openclipart.org/download/227427/private-cloud-icon.svg
+
+End of Remarks -->
+
+
+<!DOCTYPE HTML>
+
+<html lang="en">
+
+	<!-- * * * * * * * * * *
+	*         head         *
+	* * * * * * * * * * -->
+	<head>
+
+		<!-- meta data -->
+		<meta charset="UTF-8">																										<!-- characters encoding -->
+		<meta name="description" content="Secure file share platform">																<!-- description of the web page -->
+		<meta name="keywords" content="secure, file, share">
+		<meta name="author" content="Brice Guillaume, Adam Kettani, Mathieu Lapeyre, Jérémy Parriaud">
+		<meta name="google-signin-scope" content="profile email">																	<!-- Google button integration for sign-in -->
+		<meta name="google-signin-client_id" content="45783031879-hpkot78o84l86umbh9u79i4ketfravej.apps.googleusercontent.com">
+
+		<!-- title -->
+		<title>Secure Share</title>
+
+		<!-- * * * dependencies * * * -->
+
+		<link rel="icon" type="image/png" href="./img/secure_file_share.png" />		<!-- favicon -->
+		<link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css">			<!-- jquery librairy stylesheet -->
+		<script src="./js/jquery-1.12.3.min.js"></script>							<!-- jquery librairy -->
+		<script src="./js/jquery.mobile-1.4.5.min.js"></script>						<!-- jquery mobile librairy -->
+		<script src="./js/platform.js" async defer></script>	<!-- javascript page for Google sign-in -->
+		<script src="./js/annex.js"></script>										<!-- annex javascript page -->
+			
+		<!-- * * * end of dependencies * * * -->
+
+		<!-- IE6, IE7 and IE8 support of HTML5 elements -->
+		<!--[if lt IE 9]>
+			<script src="./js/html5.js"></script>
+		<![endif]-->
+
+		<!-- * * * global variables * * * -->
+
+	</head>
+	<!-- * * * * * * * * * *
+	*      end of head     *
+	* * * * * * * * * * -->
+
+
+	<!-- * * * * * * * * * *
+	*         body         *
+	* * * * * * * * * * -->
+	<body>
+
+		<!-- * * * Page 'pre-home' * * * -->
+		<!-- The purpose of this page is to redirect immediately to the 'home' page
+		This is to load javascript changes when going to the 'home' page
+		Indeed the JQuery Mobile library does not execute javascript on the first page
+		Depending on whether the user has already authenticated or not
+		She is redirected to the 'home' page to enjoy the app or the 'auth' page to first authenticate -->
+
+		<div data-role="page" id="pre-home">
+			<script type="text/javascript">
+				if (readCookie("token") == null) {
+					window.location.href = "#auth";
+				}
+				else {
+					window.location.href = "#home";
+				}
+			</script>
+		</div>
+
+		<!-- * * * End of page 'pre-home' * * * -->
+
+
+		<!-- * * * Page 'auth' * * * -->
+		<!-- This page is the home page displayed to the user to authenticate via Google  -->
+
+		<div data-role="page" id="auth">
+
+			<!-- * header * -->
+			<script> header("auth"); </script>
+			<!-- * end of header * -->
+			
+			<!-- * main * -->
+			<center>
+				<div id='boutongoogle'><div class="g-signin2" data-onsuccess="onSignIn"></div></div>
+			</center>
+			<script>
+				/* Google function setting a cookie */
+				function onSignIn(googleUser) {
+					mytoken = googleUser.getAuthResponse().access_token;
+					createCookie("token", mytoken, 1);
+					location.reload(true);
+				};
+				/* signup the user if first time logging-in */
+				signup(readCookie("token"));
+			</script>	
+			<!-- * end of main * -->
+
+			<!-- * footer * -->
+			<script> footer(); </script>
+			<!-- * end of footer * -->
+
+		</div>
+
+		<!-- * * * End of page 'auth' * * * -->
+
+
+		<!-- * * * Page 'home' * * * -->
+		<!-- This page is the home page displayed to the user
+		It automatically queries secure share servers to display groups related to the user
+		From here you can click on a particular group => redirects to the 'group' page
+		From here you can create a new group => redirects to the 'creategroup' page -->
+
+		<div data-role="page" id="home">
+
+			<!-- * header * -->
+			<script> header("home"); </script>
+			<!-- * end of header * -->
+			
+			<!-- * main * -->
+			<div data-role="main" class="ui-content">
+				<center>
+					<div id="loading"></div>									<!-- loading image -->
+					<div id="displaygroups"></div><br/>							<!-- display groups -->
+					<a href="#creategroup" style="text-decoration: none;">		<!-- create group -->
+						<button style="width: 200px;">Create New Group</button>
+					</a>
+				</center>
+			</div>
+			<!-- * end of main * -->
+
+			<!-- * footer * -->
+			<script> footer(); </script>
+			<!-- * end of footer * -->
+
+		</div>
+
+		<!-- * * * End of page 'home' * * * -->
+
+
+		<!-- * * * Page 'group' * * * -->
+		<!-- This page provides a general overview of the group selected from the 'home' page
+		It automatically queries secure share servers to display file names and last versions uploaded on the group
+		It automatically queries secure share servers to display members belonging to the group
+		From here you can click on a particular file => queries secure share servers to download the file
+		From here you can add other users to the group => queries secure share servers to update the group
+		From here you can load a file on the group => queries secure share servers to upload the file -->
+
+		<div data-role="page" id="group">
+
+			<!-- * header * -->
+			<script> header("group"); </script>
+			<!-- * end of header * -->
+			
+			<!-- * main * -->
+			<div data-role="main" class="ui-content">
+				<center>
+				
+					<div id="group_title"></div>
+					<div id="loading"></div> <!-- loading image -->
+
+					<table>
+						<tr>
+							<td style="vertical-align: top;"> <!-- display groups -->
+							<center>
+								<h2>Files</h2>
+								<div id="displayfiles" style="width:400px;"></div>	
+							</center>
+							</td>
+							<td style="vertical-align: top;"> <!-- display users -->
+							<center>
+								<h2>Members</h2>
+								<div id="displayusers" style="width:300px;"></div>		
+							</center>
+							</td>
+						</tr>
+						<tr style="height:5px;">
+						</tr>
+						<tr>
+							<td style="vertical-align: top;"> <!-- add user -->
+								<center>
+									<h2>Add another user</h2>
+									<form id="form_adduser" style="width:300px;">
+										<input id="user_mail1" type="text" placeholder="User email #1"/>
+									</form>
+									<button id="adduser" style="width:300px;" title="Add another user to the group">+</button>
+									<button id="submit_add_users" style="width:300px; background-color: #E98003;">Register new users</button>
+								</center>
+							</td>
+							<td style="vertical-align: top;"> <!-- upload file -->
+								<center>
+									<h2>Upload a file</h2>
+									<form id="form_upload_file" style="width:300px;">
+										<input type="file" id="upload_file">
+									</form>
+									<button id="upload" style="width:300px;">Upload</button>
+								</center>
+							</td>
+						</tr>
+					</table>
+
+				</center>
+				
+			</div>
+			<!-- * end of main * -->
+
+			<!-- * footer * -->
+			<script> footer(); </script>
+			<!-- * end of footer * -->
+
+		</div>
+		<!-- * * * End of page 'group' * * * -->
+
+
+		<!-- * * * Page 'creategroup' * * * -->
+		<!-- This page displays an interface to create a new group
+		From here you can create a new group => queries secure share servers to update the group -->
+
+		<div data-role="page" id="creategroup">
+
+			<!-- * header * -->
+			<script> header("creategroup"); </script>
+			<!-- * end of header * -->
+			
+			<!-- * main * -->
+			<div data-role="main" class="ui-content">
+				<center>
+				
+				<div id="loading"></div><!-- loading image -->
+				
+				<!-- TO DO -->
+				<form id="general_form_creategroup" style="width:500px;">
+					<input id="name_groupcreate" type="text" placeholder="Group name"/>
+					<span>Note that by creating a group, you include yourself by default.</span>
+					<div id="form_creategroup"></div>
+				</form >
+				<button id="adduser_creategroup" style="width:300px;" title="Add another user to the group">Add Another User to the Group</button>
+				<button id="submit_creategroup" style="width:200px; background-color: #E98003;">Create Group</button>
+				
+				</center>
+				
+			</div>
+			<!-- * end of main * -->
+
+			<!-- * footer * -->
+			<script>footer();</script>
+			<!-- * end of footer * -->
+
+		</div>
+		<!-- * * * End of page 'creategroup' * * * -->
+
+
+		<!-- * * * Page 'about' * * * -->
+		<!-- This page gives some information about the secure share application -->
+
+		<div data-role="page" id="about">
+
+			<!-- * header * -->
+			<script> header("about"); </script>
+			<!-- * end of header * -->
+			
+			<!-- * main * -->
+			<div data-role="main" class="ui-content">
+				<center>
+					<p style="max-width:800px;">
+						This application has been realized as part of a <a href="http://users.ece.gatech.edu/~dblough/6102">Dependable and Distributed Systems</a>
+						class project at the <a href="http://www.gatech.edu/">Georgia Institute of Technology</a>. As such it is first and foremost an online platform
+						storing files in a distributed (i.e. on several servers) and dependable (i.e. resilient to unexpected errors) way. Files are accessed on a
+						group membership basis, using the Google API for authentication.
+					</p>
+				</center>
+			</div>
+			<!-- * end of main * -->
+
+			<!-- * footer * -->
+			<script> footer(); </script>
+			<!-- * end of footer * -->
+
+		</div>
+		<!-- * * * End of page 'about' * * * -->
+
+
+		<!-- * * * Page 'contact' * * * -->
+		<!-- This page gives information to contact the creators of the application -->
+
+		<div data-role="page" id="contact">
+
+			<!-- * header * -->
+			<script> header("contact"); </script>
+			<!-- * end of header * -->
+			
+			<!-- * main * -->
+			<div data-role="main" class="ui-content">
+				<center>
+					<p>
+						Please contact us at:
+						<br/>
+						<a href="mailto:brice.guillaume@gatech.edu">brice.guillaume@gatech.edu</a><br/>
+						<a href="mailto:mathieu.lapeyre@gatech.edu">mathieu.lapeyre@gatech.edu</a><br/>
+						<a href="mailto:adam.kettani@gatech.edu">adam.kettani@gatech.edu</a><br/>
+						<a href="mailto:jeremyparriaud@gatech.edu">jeremyparriaud@gatech.edu</a><br/>
+						<br/>
+						Please contact our advisor at:
+						<br/>
+						<a href="mailto:doug.blough@ece.gatech.edu">doug.blough@ece.gatech.edu</a>
+					</p>
+				</center>
+			</div>
+			<!-- * end of main * -->
+
+			<!-- * footer * -->
+			<script> footer(); </script>
+			<!-- * end of footer * -->
+
+		</div>
+		<!-- * * * End of page 'contact' * * * -->
+
+
+		<!-- * execute the main.js script after the body has been processed by the browser *
+		This is because some functions need the content to be first loaded in the DOM -->
+		<script type="text/javascript" src="./js/main.js"></script>
+
+	</body>
+	<!-- * * * * * * * * * *
+	*     End of body      *
+	* * * * * * * * * * -->
+
+</html>

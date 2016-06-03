@@ -1,0 +1,17 @@
+<Context>
+
+    <Resource name="jdbc/managment_bdd" auth="Container" type="javax.sql.DataSource"
+              maxActive="50" maxIdle="30" maxWait="10000"
+              username="root" password="GTL2016"
+              driverClassName="com.mysql.jdbc.Driver"
+              url="jdbc:mysql://localhost/managment_bdd"/>
+
+    <multipart-config>
+
+        <max-file-size>52428800</max-file-size>
+        <max-request-size>52428800</max-request-size>
+        <file-size-threshold>0</file-size-threshold>
+
+    </multipart-config>
+
+</Context>
